@@ -173,13 +173,7 @@ function PickerPanel<DateType>(props: PickerPanelProps<DateType>) {
   // ============================ State =============================
 
   const panelContext = React.useContext(PanelContext);
-  const {
-    operationRef,
-    panelRef: panelDivRef,
-    onSelect: onContextSelect,
-    hideRanges,
-    defaultOpenValue,
-  } = panelContext;
+  const { operationRef, onSelect: onContextSelect, hideRanges, defaultOpenValue } = panelContext;
 
   const { inRange, panelPosition, rangedValue, hoverRangedValue } = React.useContext(RangeContext);
   const panelRef = React.useRef<PanelRefProps>({});
@@ -205,22 +199,20 @@ function PickerPanel<DateType>(props: PickerPanelProps<DateType>) {
     defaultValue: defaultPickerValue || mergedValue,
     postState: (date) => {
       const now = generateConfig.getNow();
-      if (!date) return now;
+      if (!date) {
+        return now;
+      }
       // When value is null and set showTime
       if (!mergedValue && showTime) {
-        if (typeof showTime === 'object') {
-          return setDateTime(
-            generateConfig,
-            Array.isArray(date) ? date[0] : date,
-            showTime.defaultValue || now,
-          );
-        }
-        if (defaultValue) {
-          return setDateTime(generateConfig, Array.isArray(date) ? date[0] : date, defaultValue);
-        }
-        return setDateTime(generateConfig, Array.isArray(date) ? date[0] : date, now);
+        const defaultDateObject =
+          typeof showTime === 'object' ? showTime.defaultValue : defaultValue;
+        return setDateTime(
+          generateConfig,
+          Array.isArray(date) ? date[0] : date,
+          defaultDateObject || now,
+        );
       }
-      return date;
+      return Array.isArray(date) ? date[0] : date;
     },
   });
 
@@ -555,7 +547,6 @@ function PickerPanel<DateType>(props: PickerPanelProps<DateType>) {
         onKeyDown={onInternalKeyDown}
         onBlur={onInternalBlur}
         onMouseDown={onMouseDown}
-        ref={panelDivRef}
       >
         {panelNode}
         {extraFooter || rangesNode || todayNode ? (
